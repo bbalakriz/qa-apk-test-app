@@ -1,0 +1,40 @@
+[0-0] 2025-07-30T06:39:48.002Z INFO webdriver: COMMAND setTimeouts(5000, undefined, undefined)
+[0-0] 2025-07-30T06:39:48.004Z INFO webdriver: [POST] http://127.0.0.1:4723/session/dc31caf3-d377-4557-98e0-27a30b21da51/timeouts
+[0-0] 2025-07-30T06:39:48.004Z INFO webdriver: DATA { implicit: 5000 }
+[0-0] 2025-07-30T06:39:48.032Z INFO webdriver: RESULT null
+[0-0] 2025-07-30T06:39:48.973Z ERROR @wdio/runner: Error: require() cannot be used on an ESM graph with top-level await. Use import() instead. To see where the top-level await comes from, use --experimental-print-required-tla.
+[0-0]   From /Users/varun.x.krishna/Projects/qa-apk-test-app/node_modules/@cucumber/cucumber/lib/formatter/builder.js 
+[0-0]   Requiring /Users/varun.x.krishna/Projects/qa-apk-test-app/node_modules/@wdio/cucumber-framework/build/cucumberFormatter.js 
+[0-0]     at ModuleJobSync.runSync (node:internal/modules/esm/module_job:497:13)
+[0-0]     at ModuleLoader.importSyncForRequire (node:internal/modules/esm/loader:437:47)
+[0-0]     at loadESMFromCJS (node:internal/modules/cjs/loader:1523:24)
+[0-0]     at Module._compile (node:internal/modules/cjs/loader:1674:5)
+[0-0]     at node:internal/modules/cjs/loader:1824:10
+[0-0]     at Object.require.extensions.<computed> [as .js] (/Users/varun.x.krishna/Projects/qa-apk-test-app/node_modules/ts-node/src/index.ts:1608:43)
+[0-0]     at Module.load (node:internal/modules/cjs/loader:1427:32)
+[0-0]     at Module._load (node:internal/modules/cjs/loader:1250:12)
+[0-0]     at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+[0-0]     at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+[0-0]  Error:  require() cannot be used on an ESM graph with top-level await. Use import() instead. To see where the top-level await comes from, use --experimental-print-required-tla.
+  From /Users/varun.x.krishna/Projects/qa-apk-test-app/node_modules/@cucumber/cucumber/lib/formatter/builder.js 
+  Requiring /Users/varun.x.krishna/Projects/qa-apk-test-app/node_modules/@wdio/cucumber-framework/build/cucumberFormatter.js 
+[0-0] 2025-07-30T06:39:48.974Z INFO webdriver: COMMAND deleteSession()
+[0-0] 2025-07-30T06:39:48.974Z INFO webdriver: [DELETE] http://127.0.0.1:4723/session/dc31caf3-d377-4557-98e0-27a30b21da51
+[0-0] 2025-07-30T06:39:49.044Z INFO webdriver: RESULT null
+[0-0] Session ended.
+[0-0] FAILED in Android - file:///features/launch-app.feature
+2025-07-30T06:39:49.160Z INFO @wdio/cli:launcher: Run onWorkerEnd hook
+2025-07-30T06:39:49.161Z INFO @wdio/cli:launcher: Run onComplete hook
+Test execution completed.
+
+Spec Files:	 0 passed, 1 failed, 1 total (100% completed) in 00:00:08  
+
+2025-07-30T06:39:49.161Z INFO @wdio/local-runner: Shutting down spawned worker
+2025-07-30T06:39:49.412Z INFO @wdio/local-runner: Waiting for 0 to shut down gracefully
+2025-07-30T06:39:49.413Z INFO @wdio/local-runner: shutting down
+[INFO] Cleaning up...
+[INFO] Stopping Appium server (PID: 35403)...
+[SUCCESS] Appium server stopped
+[SUCCESS] Cleanup completed
+varun.x.krishna@IGA-KGJCY12MC6 qa-apk-test-app % npm --version
+11.4.2
