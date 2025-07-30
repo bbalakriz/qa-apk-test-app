@@ -1,6 +1,12 @@
-# QA APK Test Automation - Hybrid Docker Compose  
+# QA APK Test Automation - Hybrid Container Compose  
 # Framework in container + Host emulator (cleanest setup)
 # QA can watch tests run on their visible emulator screen
+# Works with both Podman and Docker
+# 
+# ALIGNED VERSIONS:
+# - Node.js: 18.20.8 (matches local .nvmrc)
+# - Java: OpenJDK 17 (matches local Homebrew version)
+# - Android SDK: 34.0.0 (matches modern local setup)
 
 version: '3.8'
 
@@ -23,7 +29,7 @@ services:
       - "4723:4723"
     environment:
       - ANDROID_HOME=/opt/android-sdk
-      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+      - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
     # Connect to host network to reach emulator
     network_mode: "host"
     command: ["sh", "-c", "sleep 5 && npm test"]
@@ -39,6 +45,6 @@ services:
       - "4723:4723"
     environment:
       - ANDROID_HOME=/opt/android-sdk
-      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+      - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
     network_mode: "host"
     command: ["npm", "run", "appium"]

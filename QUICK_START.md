@@ -29,15 +29,19 @@ sudo apt-get install -y nodejs
 ### 📋 Other Requirements
 
 Ensure you also have:
-✅ **Java JDK 8+** installed ([Download here](https://www.oracle.com/java/technologies/downloads/))  
+✅ **Java JDK 17** installed ([Download here](https://www.oracle.com/java/technologies/downloads/)) - for perfect alignment  
 ✅ **Android Studio** with SDK installed ([Download here](https://developer.android.com/studio))  
 ✅ **Android emulator** running  
+✅ **Podman** or **Docker** ([Podman](https://podman.io/getting-started/installation) | [Docker](https://docs.docker.com/get-docker/)) - optional, for containerized runs  
 
 ### ✅ Quick Verification:
 ```bash
-node --version    # Should show v16+
-java -version     # Should show 1.8+
+node --version    # Should show v18.20.8 (for perfect alignment)
+java -version     # Should show 17.x.x (for perfect alignment)
 adb devices       # Should show an emulator
+
+# Check version alignment (recommended)
+npm run verify-versions
 ```
 
 ## 🚀 Setup (1 minute)
@@ -113,6 +117,12 @@ If everything works, you should see:
 
 **Issue**: Emulator not detected
 **Solution**: Ensure emulator is running: `adb devices` should show your device
+
+**Issue**: ESM/Module loading errors
+**Solution**: 
+- Check version alignment: `npm run verify-versions`
+- If versions differ, use containers for guaranteed consistency: `npm run podman:hybrid` or `npm run docker:hybrid`
+- Or install exact local versions: Node 18.20.8, Java 17
 
 ## 📝 Next Steps
 

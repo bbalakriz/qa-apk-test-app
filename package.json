@@ -12,11 +12,15 @@
     "deploy": "./scripts/manage-apk.sh deploy",
     "install-apk": "./scripts/manage-apk.sh install",
     "verify": "node scripts/verify-setup.js",
+    "verify-versions": "./scripts/verify-versions.sh",
     "appium": "npx appium --port 4723",
     "clean": "rm -rf node_modules screenshots/* test-results/* logs/* && npm install",
+    "podman:hybrid": "./docker/start-hybrid.sh",
+    "podman:container-emulator": "cd docker && podman-compose -f docker-compose.container-emulator.yml up",
+    "podman:build": "cd docker && podman build -t qa-automation .",
     "docker:hybrid": "./docker/start-hybrid.sh",
-    "docker:container-emulator": "cd docker && docker-compose -f docker-compose.container-emulator.yml up",
-    "docker:build": "cd docker && docker build -t qa-automation ."
+    "docker:container-emulator": "cd docker && podman-compose -f docker-compose.container-emulator.yml up",
+    "docker:build": "cd docker && podman build -t qa-automation ."
   },
   "keywords": [
     "appium",
@@ -30,17 +34,17 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.10.0",
-    "@wdio/cli": "^8.20.0",
-    "@wdio/cucumber-framework": "^8.20.0", 
-    "@wdio/local-runner": "^8.20.0",
-    "@wdio/spec-reporter": "^8.20.0",
-    "@wdio/appium-service": "^8.20.0",
+    "@wdio/cli": "^8.24.0",
+    "@wdio/cucumber-framework": "^8.24.0",
+    "@wdio/local-runner": "^8.24.0",
+    "@wdio/spec-reporter": "^8.24.0",
+    "@wdio/appium-service": "^8.24.0",
     "appium": "^2.2.1",
     "appium-uiautomator2-driver": "^2.34.1",
     "typescript": "^5.3.0",
     "ts-node": "^10.9.0"
   },
   "dependencies": {
-    "webdriverio": "^8.20.0"
+    "webdriverio": "^8.24.0"
   }
 } 

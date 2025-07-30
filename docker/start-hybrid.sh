@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# QA APK Test Automation - Hybrid Container Start Script
+# QA APK Test Automation - Hybrid Container Start Script  
 # Framework in container, connects to host emulator
+# Supports both Docker and Podman
 
 set -e
 
@@ -60,9 +61,24 @@ if [ ! -f "./app.apk" ]; then
 fi
 
 # Build container if needed
-print_status "Building Docker container..."
-podman build -t qa-automation -f docker/Dockerfile || {
-    print_error "Failed to build Docker container"
+# Auto-detect container engine
+if command -v podman &> /dev/null; then
+    CONTAINER_ENGINE="podman"
+    COMPOSE_CMD="podman-compose"
+elif command -v docker &> /dev/null; then
+    CONTAINER_ENGINE="docker"
+    COMPOSE_CMD="docker-compose"
+else
+    print_error "Neither Podman nor Docker found!"
+    echo "Please install one of them:"
+    echo "  Podman: https://podman.io/getting-started/installation"
+    echo "  Docker: https://docs.docker.com/get-docker/"
+    exit 1
+fi
+
+print_status "Building container using $CONTAINER_ENGINE..."
+$CONTAINER_ENGINE build -t qa-automation -f docker/Dockerfile . || {
+    print_error "Failed to build container with $CONTAINER_ENGINE"
     exit 1
 }
 
@@ -71,7 +87,7 @@ print_status "Starting containerized tests..."
 print_status "Test results will be saved to ../test-results/"
 print_status "Screenshots will be saved to ../screenshots/"
 
-podman-compose up --abort-on-container-exit qa-automation
+$COMPOSE_CMD up --abort-on-container-exit qa-automation
 
 # Show results
 echo ""
@@ -84,4 +100,4 @@ echo "- Logs: ../logs/"
 
 # Clean up
 print_status "Cleaning up containers..."
-podman-compose down
+$COMPOSE_CMD down

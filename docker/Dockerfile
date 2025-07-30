@@ -1,11 +1,13 @@
-# QA APK Test Automation - Docker Container
-# This container includes everything except the Android emulator
+# QA APK Test Automation - Container Image
+# This container includes everything except the Android emulator  
+# Works with both Podman and Docker
+# Aligned with local environment: Node 18.20.8, OpenJDK 17, Android SDK 36
 
-FROM node:18-bullseye
+FROM node:18.20.8-bullseye
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    openjdk-11-jdk \
+    openjdk-17-jdk \
     wget \
     unzip \
     curl \
@@ -15,7 +17,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Set JAVA_HOME
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
 # Install Android SDK
 ENV ANDROID_HOME=/opt/android-sdk
@@ -27,9 +29,9 @@ RUN mkdir -p ${ANDROID_HOME}/cmdline-tools && \
     mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest && \
     rm /tmp/cmdline-tools.zip
 
-# Install Android SDK components
+# Install Android SDK components (aligned with local ADB 36.0.0)
 RUN yes | sdkmanager --licenses && \
-    sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+    sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
 # Set working directory
 WORKDIR /app
