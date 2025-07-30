@@ -48,7 +48,6 @@ Thumbs.db
 *.swo
 
 # APK files (add your APK manually)
-*.apk
 
 # Environment variables
 .env

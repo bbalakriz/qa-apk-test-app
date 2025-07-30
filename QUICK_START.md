@@ -1,6 +1,6 @@
 # 🚀 Quick Start Guide
 
-**Get up and running in 3 minutes!**
+**Get up and running in 4 minutes!** *(Now includes Appium setup)*
 
 ## 📋 Prerequisites (1 minute)
 
@@ -39,6 +39,24 @@ npm run deploy /path/to/your/app.apk
 cp /path/to/your/app.apk ./app.apk
 ```
 
+## 🚀 Start Appium Server (30 seconds)
+
+**Important**: Appium must be running before tests can execute.
+
+```bash
+# Option A: Start Appium manually (recommended for development)
+npm run appium
+
+# Keep this terminal open - Appium runs in foreground
+# Open a new terminal for running tests
+```
+
+```bash
+# Option B: Auto-start with tests (simpler for CI/CD)
+npm test
+# This automatically starts/stops Appium for you
+```
+
 ## 🧪 Run Tests (30 seconds)
 
 ```bash
@@ -59,14 +77,20 @@ If everything works, you should see:
 
 ## 🆘 Troubleshooting
 
-**Issue**: Tests fail to connect
-**Solution**: `npm run appium` in a separate terminal
+**Issue**: Tests fail to connect to Appium
+**Solution**: 
+- Check if Appium is running: `curl http://127.0.0.1:4723/status`
+- If not running: `npm run appium` in a separate terminal
+- Wait 10-15 seconds for Appium to fully start
 
 **Issue**: App shows red screen
 **Solution**: Use release APK, not debug APK
 
 **Issue**: Element not found
-**Solution**: Check element IDs in your app
+**Solution**: Check element IDs in your app with `adb shell uiautomator dump`
+
+**Issue**: Emulator not detected
+**Solution**: Ensure emulator is running: `adb devices` should show your device
 
 ## 📝 Next Steps
 
