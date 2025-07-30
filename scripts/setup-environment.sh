@@ -39,7 +39,7 @@ print_error() {
 
 # Check Prerequisites
 echo ""
-print_status "Checking prerequisites..."
+print_status "Checking exact version requirements (prevents ESM errors)..."
 
 # Check Node.js
 if command_exists node; then

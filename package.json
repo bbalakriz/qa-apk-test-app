@@ -13,6 +13,7 @@
     "install-apk": "./scripts/manage-apk.sh install",
     "verify": "node scripts/verify-setup.js",
     "verify-versions": "./scripts/verify-versions.sh",
+    "check-versions": "./scripts/verify-versions.sh",
     "appium": "npx appium --port 4723",
     "clean": "rm -rf node_modules screenshots/* test-results/* logs/* && npm install",
     "podman:hybrid": "./docker/start-hybrid.sh",

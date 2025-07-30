@@ -52,25 +52,45 @@ echo
 
 # Check Java versions
 print_status "Java Version Check:"
-JAVA_VERSION=$(java -version 2>&1 | head -n 1 | cut -d'"' -f2 | cut -d'.' -f1 2>/dev/null || echo "Not installed")
-EXPECTED_JAVA="17"
+JAVA_FULL_VERSION=$(java -version 2>&1 | head -n 1 | cut -d'"' -f2 2>/dev/null || echo "Not installed")
+JAVA_MAJOR=$(echo "$JAVA_FULL_VERSION" | cut -d'.' -f1)
+EXPECTED_JAVA_FULL="17.0.16"
+EXPECTED_JAVA_MAJOR="17"
 
-echo "  Local Java:       $JAVA_VERSION"
-echo "  Expected:         $EXPECTED_JAVA"
+echo "  Local Java:       $JAVA_FULL_VERSION"
+echo "  Expected:         $EXPECTED_JAVA_FULL"
 
-if [[ "$JAVA_VERSION" == "$EXPECTED_JAVA" ]]; then
-    print_success "Java versions are aligned"
+if [[ "$JAVA_FULL_VERSION" == "$EXPECTED_JAVA_FULL" ]]; then
+    print_success "Java versions are perfectly aligned"
+elif [[ "$JAVA_MAJOR" == "$EXPECTED_JAVA_MAJOR" ]]; then
+    print_warning "Java major version correct but minor version differs!"
+    echo "  Current: $JAVA_FULL_VERSION, Recommended: $EXPECTED_JAVA_FULL"
+    echo "  Consider upgrading for exact compatibility"
 else
-    print_warning "Java version mismatch!"
-    echo "  Install OpenJDK 17 or set JAVA_HOME correctly"
+    print_error "Java version mismatch!"
+    echo "  Install OpenJDK $EXPECTED_JAVA_FULL for guaranteed compatibility"
 fi
 echo
 
 # Check Android SDK
 print_status "Android SDK Check:"
+ADB_FULL_VERSION=$(adb --version 2>/dev/null | head -n 2 | tail -n 1 | awk '{print $2}' || echo "Not installed")
 ADB_VERSION=$(adb --version 2>/dev/null | head -n 1 | awk '{print $5}' || echo "Not installed")
+EXPECTED_ADB="1.0.41"
+EXPECTED_SDK="36.0.0"
+
 echo "  Local ADB:        $ADB_VERSION"
+echo "  Local SDK:        $ADB_FULL_VERSION"
+echo "  Expected ADB:     $EXPECTED_ADB"
 echo "  Container SDK:    34.0.0"
+
+if [[ "$ADB_VERSION" == "$EXPECTED_ADB" ]]; then
+    print_success "ADB version is perfectly aligned"
+else
+    print_warning "ADB version differs!"
+    echo "  Current: $ADB_VERSION, Expected: $EXPECTED_ADB"
+    echo "  Consider updating Android SDK platform-tools"
+fi
 
 if [[ -n "$ANDROID_HOME" ]]; then
     print_success "ANDROID_HOME is set: $ANDROID_HOME"
@@ -111,5 +131,16 @@ fi
 echo
 
 print_status "Summary:"
+if [[ "$LOCAL_NODE" == "$EXPECTED_NODE" ]] && [[ "$JAVA_FULL_VERSION" == "$EXPECTED_JAVA_FULL" ]] && [[ "$ADB_VERSION" == "$EXPECTED_ADB" ]]; then
+    print_success "🎉 Perfect! All versions exactly aligned - ESM errors prevented!"
+    echo "  You can safely run: npm test"
+else
+    print_warning "⚠️  Version mismatches detected - may cause ESM errors!"
+    echo ""
+    echo "  Quick fixes:"
+    echo "  1. Install exact versions (see VERSION_REQUIREMENTS.md)"
+    echo "  2. Or use containers: npm run podman:hybrid"
+fi
+echo ""
 echo "  For 100% reproducibility, use: npm run podman:hybrid (or npm run docker:hybrid)"
 echo "  For local development with aligned versions, ensure all checks above pass"

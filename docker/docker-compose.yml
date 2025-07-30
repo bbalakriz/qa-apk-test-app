@@ -3,10 +3,10 @@
 # QA can watch tests run on their visible emulator screen
 # Works with both Podman and Docker
 # 
-# ALIGNED VERSIONS:
-# - Node.js: 18.20.8 (matches local .nvmrc)
-# - Java: OpenJDK 17 (matches local Homebrew version)
-# - Android SDK: 34.0.0 (matches modern local setup)
+# EXACT ALIGNED VERSIONS (prevents ESM errors):
+# - Node.js: 18.20.8 (exact match with local .nvmrc)
+# - Java: OpenJDK 17.0.16 (exact match with local version)
+# - ADB: 1.0.41 (exact match with tested version)
 
 version: '3.8'
 

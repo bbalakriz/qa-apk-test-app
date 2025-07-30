@@ -28,20 +28,22 @@ sudo apt-get install -y nodejs
 
 ### 📋 Other Requirements
 
-Ensure you also have:
-✅ **Java JDK 17** installed ([Download here](https://www.oracle.com/java/technologies/downloads/)) - for perfect alignment  
+Ensure you also have these **EXACT** versions:
+✅ **Java OpenJDK 17.0.16** ([Download here](https://www.oracle.com/java/technologies/downloads/)) - **exact version required**  
 ✅ **Android Studio** with SDK installed ([Download here](https://developer.android.com/studio))  
 ✅ **Android emulator** running  
+✅ **ADB 1.0.41** (comes with Android SDK platform-tools)
 ✅ **Podman** or **Docker** ([Podman](https://podman.io/getting-started/installation) | [Docker](https://docs.docker.com/get-docker/)) - optional, for containerized runs  
 
 ### ✅ Quick Verification:
 ```bash
-node --version    # Should show v18.20.8 (for perfect alignment)
-java -version     # Should show 17.x.x (for perfect alignment)
+node --version    # Must show v18.20.8 (exact version required)
+java -version     # Must show 17.0.16 (exact version required)
+adb --version     # Must show 1.0.41 (exact version required)
 adb devices       # Should show an emulator
 
 # Check version alignment (recommended)
-npm run verify-versions
+npm run check-versions
 ```
 
 ## 🚀 Setup (1 minute)
@@ -51,7 +53,10 @@ npm run verify-versions
 git clone <this-repo>
 cd qa-apk-test-automation
 
-# 2. One-command setup (installs everything)
+# 2. Check versions first (prevents ESM errors)
+npm run check-versions
+
+# 3. One-command setup (installs everything)
 npm run setup
 ```
 

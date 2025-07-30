@@ -1,7 +1,7 @@
 # QA APK Test Automation - Container Image
 # This container includes everything except the Android emulator  
 # Works with both Podman and Docker
-# Aligned with local environment: Node 18.20.8, OpenJDK 17, Android SDK 36
+# EXACT VERSIONS ALIGNED: Node 18.20.8, OpenJDK 17.0.16, ADB 1.0.41
 
 FROM node:18.20.8-bullseye
 
