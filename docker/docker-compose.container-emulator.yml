@@ -1,0 +1,49 @@
+# QA APK Test Automation - Container Emulator Option
+# For teams who want everything containerized (including emulator)
+
+version: '3.8'
+
+services:
+  qa-automation:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: qa-automation
+    volumes:
+      - ../test-results:/app/test-results
+      - ../screenshots:/app/screenshots
+      - ../logs:/app/logs
+      - ../app.apk:/app/app.apk:ro
+      - ../features:/app/features
+    environment:
+      - ANDROID_HOME=/opt/android-sdk
+      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+    depends_on:
+      - selenium-android
+    command: ["sh", "-c", "sleep 10 && npm test"]
+
+  selenium-android:
+    image: selenium/android:4.15.0-20231110
+    container_name: selenium-android
+    ports:
+      - "4444:4444"  # Selenium Grid
+      - "5900:5900"  # VNC for viewing
+    environment:
+      - EMULATOR_DEVICE=Samsung Galaxy S10
+      - WEB_VNC=true
+    volumes:
+      - /dev/shm:/dev/shm
+    privileged: true
+
+  # VNC viewer (optional)
+  novnc:
+    image: theasp/novnc:latest
+    container_name: novnc-viewer
+    ports:
+      - "8080:8080"
+    environment:
+      - DISPLAY_WIDTH=1024
+      - DISPLAY_HEIGHT=768
+      - RUN_XTERM=no
+    depends_on:
+      - selenium-android 
