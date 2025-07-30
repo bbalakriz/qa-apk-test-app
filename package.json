@@ -40,7 +40,7 @@
     "@wdio/spec-reporter": "^8.24.0",
     "@wdio/appium-service": "^8.24.0",
     "appium": "^2.2.1",
-    "appium-uiautomator2-driver": "^2.34.1",
+    "appium-uiautomator2-driver": "^2.45.1",
     "typescript": "^5.3.0",
     "ts-node": "^10.9.0"
   },
