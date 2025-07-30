@@ -1,17 +1,39 @@
 # 🚀 Quick Start Guide
 
-**Get up and running in 4 minutes!** *(Now includes Appium setup)*
+**Get up and running in 5-6 minutes!** *(Includes Node.js installation & Appium setup)*
 
-## 📋 Prerequisites (1 minute)
+## 📋 Prerequisites (2-3 minutes)
 
-Before starting, ensure you have:
+### 🟢 Install Node.js 16+ (1 minute)
 
-✅ **Node.js 16+** installed  
-✅ **Java JDK 8+** installed  
-✅ **Android Studio** with SDK installed  
+**Don't have Node.js?** Install it now:
+
+```bash
+# Option A: Download from official site (recommended)
+# Visit: https://nodejs.org (choose LTS version)
+
+# Option B: Using package managers
+# macOS (with Homebrew):
+brew install node
+
+# Windows (with Chocolatey):
+choco install nodejs
+
+# Linux (Ubuntu/Debian):
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+**⚠️ Important**: After installing Node.js, restart your terminal/command prompt!
+
+### 📋 Other Requirements
+
+Ensure you also have:
+✅ **Java JDK 8+** installed ([Download here](https://www.oracle.com/java/technologies/downloads/))  
+✅ **Android Studio** with SDK installed ([Download here](https://developer.android.com/studio))  
 ✅ **Android emulator** running  
 
-Quick check:
+### ✅ Quick Verification:
 ```bash
 node --version    # Should show v16+
 java -version     # Should show 1.8+
