@@ -89,7 +89,7 @@ check_prerequisites() {
     fi
     
     # Check emulator
-    if ! adb devices | grep -q "emulator"; then
+    if ! adb devices | grep -i "emulator"; then
         print_error "No Android emulator detected"
         print_error "Please start an Android emulator before running tests"
         exit 1

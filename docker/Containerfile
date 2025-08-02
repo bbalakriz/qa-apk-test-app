@@ -1,0 +1,77 @@
+# --- Builder stage ---
+    FROM registry.redhat.io/ubi8/nodejs-18:1-140 AS builder
+    USER root
+    WORKDIR /workspace
+    
+    # 1) System deps + Android SDK
+    RUN yum update -y \
+      && yum install -y \
+           java-17-openjdk-devel \
+           wget unzip curl git python39 python39-pip \
+      && yum clean all
+    
+    ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+    ENV ANDROID_HOME=/opt/android-sdk
+    ENV PATH=$PATH:/opt/android-sdk/platform-tools:/opt/android-sdk/cmdline-tools/latest/bin
+    
+    RUN mkdir -p $ANDROID_HOME/cmdline-tools/latest \
+      && curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip \
+          -o /tmp/sdk.zip \
+      && unzip /tmp/sdk.zip -d $ANDROID_HOME/cmdline-tools/latest \
+      && rm /tmp/sdk.zip \
+      # flatten nested cmdline-tools folder
+      && mv $ANDROID_HOME/cmdline-tools/latest/cmdline-tools/* \
+            $ANDROID_HOME/cmdline-tools/latest/ \
+      && rm -rf $ANDROID_HOME/cmdline-tools/latest/cmdline-tools \
+      # accept licenses + install required SDK components
+      && yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME --licenses \
+      && $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME \
+           "platform-tools" "platforms;android-34" "build-tools;34.0.0" \
+      && yum clean all \
+      && rm -rf /var/cache/yum /tmp/*
+    
+    # 2) Application dependencies (no build step)
+    COPY package*.json ./
+    RUN npm ci
+    RUN npm prune --production
+    
+    # 3) Install Appium UIAutomator2 driver
+    RUN npm install --prefix /tmp/appium appium \
+      && cd /tmp/appium \
+      && npx appium driver install uiautomator2
+    
+    # 4) Copy all source (tests, scripts, etc.)
+    COPY . .
+    
+    # --- Runtime stage ---
+    FROM registry.redhat.io/ubi8/nodejs-18-minimal
+    USER root
+    WORKDIR /app
+    
+    # 1) Copy Android SDK & tooling
+    COPY --from=builder /opt/android-sdk /opt/android-sdk
+    
+    ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+    ENV ANDROID_HOME=/opt/android-sdk
+    ENV PATH=$PATH:/opt/android-sdk/platform-tools
+    
+    # 2) Copy app code & production deps
+    COPY --from=builder /workspace/package*.json ./
+    COPY --from=builder /workspace/node_modules ./node_modules
+    COPY --from=builder /workspace ./
+    
+    # 3) Copy Appium driver
+    COPY --from=builder /tmp/appium /tmp/appium
+    
+    # 4) Recreate /tmp dirs & set perms
+    RUN mkdir -p /tmp/appium /tmp/screenshots /tmp/test-results /tmp/logs \
+      && chmod -R 777 /tmp/appium /tmp/screenshots /tmp/test-results /tmp/logs \
+      && chmod -R 755 /opt/android-sdk \
+      && microdnf clean all || true
+    
+    # 5) Drop back to non-root & expose port
+    USER 1001
+    EXPOSE 4723
+    
+    CMD ["npm", "run", "appium"]
+    

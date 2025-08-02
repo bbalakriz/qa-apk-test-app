@@ -64,24 +64,8 @@ npm run podman:build
 # Run hybrid mode (recommended)
 npm run podman:hybrid
 
-# Run with container emulator
-npm run podman:container-emulator
-
 # Check versions alignment
 npm run verify-versions
-```
-
-## 🔄 Docker Compatibility
-
-The project maintains full Docker compatibility:
-
-```bash
-# All these commands work identically:
-npm run podman:hybrid    # Uses Podman
-npm run docker:hybrid    # Uses Docker (if available)
-
-# Auto-detection in scripts
-./docker/start-hybrid.sh  # Automatically detects Podman or Docker
 ```
 
 ## 🆘 Troubleshooting

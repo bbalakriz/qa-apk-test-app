@@ -2,6 +2,10 @@
 
 **Professional-grade end-to-end testing for Android APK files using Appium, WebdriverIO, and Cucumber BDD framework.**
 
+## ⚠️ FIRST-TIME SETUP CRITICAL
+
+**🔴 BEFORE RUNNING TESTS**: Update bridge IP in `wdio.conf.js` and `docker/docker-compose.yml` for your machine! See [QUICK_START.md](QUICK_START.md) or [IP_CONFIGURATION.md](IP_CONFIGURATION.md) for detailed instructions.
+
 Perfect for QA teams who need to quickly set up automated testing for any Android APK without writing complex code!
 
 ---

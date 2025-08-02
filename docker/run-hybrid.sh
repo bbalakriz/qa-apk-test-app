@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# QA APK Test Automation - Hybrid Container Start Script  
+# QA APK Test Automation - Run Hybrid Container (Registry Images)
+# Always uses fresh images from quay.io registry
 # Framework in container, connects to host emulator
 # Supports Podman
-# Usage: ./start-hybrid.sh [platform]
+# Usage: ./run-hybrid.sh [platform]
 # Platforms: linux (for WSL), mac-intel, mac-arm, or auto-detect
 
 set -e
@@ -49,8 +50,8 @@ case $PLATFORM_ARG in
         ;;
 esac
 
-echo "🐳 Starting QA Automation (Hybrid Mode - $PLATFORM_TAG)..."
-echo "========================================================="
+echo "🚀 Running QA Automation (Hybrid Mode - No Build - $PLATFORM_TAG)..."
+echo "===================================================================="
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -72,7 +73,7 @@ print_error() {
 
 # Check if emulator is running
 print_status "Checking for Android emulator..."
-if adb devices | grep -i "emulator"; then
+if adb devices | grep -q "emulator"; then
     print_status "✅ Android emulator is running"
     adb devices
 else
@@ -103,7 +104,6 @@ if [ ! -f "./app.apk" ]; then
     fi
 fi
 
-# Build container if needed
 # Check for Podman
 if command -v podman &> /dev/null; then
     CONTAINER_ENGINE="podman"
@@ -115,33 +115,54 @@ else
     exit 1
 fi
 
-print_status "Building container using $CONTAINER_ENGINE for platform $PLATFORM..."
-$CONTAINER_ENGINE build --platform $PLATFORM -t qa-automation:$PLATFORM_TAG -f docker/Dockerfile.ubi8 . || {
-    print_error "Failed to build container with $CONTAINER_ENGINE"
-    exit 1
-}
+# Always use registry images - pull fresh from quay.io
+print_status "Using registry images from quay.io/balki404/qa-automation:$PLATFORM_TAG"
 
-# Start services
-print_status "Starting QA automation services..."
-print_status "Appium server will be available at http://localhost:4723"
+# Check if registry image already exists locally
+if $CONTAINER_ENGINE images --format "{{.Repository}}:{{.Tag}}" | grep -q "quay.io/balki404/qa-automation:$PLATFORM_TAG"; then
+    print_status "✅ Registry image already available locally"
+else
+    print_status "Pulling fresh image from registry..."
+    $CONTAINER_ENGINE pull quay.io/balki404/qa-automation:$PLATFORM_TAG || {
+        print_error "Failed to pull QA automation image from registry"
+        echo "Please check:"
+        echo "1. Internet connection"
+        echo "2. Registry availability: quay.io/balki404/qa-automation:$PLATFORM_TAG"
+        echo "3. Or build locally: ./docker/start-hybrid.sh $PLATFORM_ARG"
+        exit 1
+    }
+    print_status "✅ Registry image pulled successfully"
+fi
 
+# Tag for compose compatibility (both services use same image)
+$CONTAINER_ENGINE tag quay.io/balki404/qa-automation:$PLATFORM_TAG qa-automation:$PLATFORM_TAG
+
+# Run tests
+print_status "Starting containerized tests..."
+print_status "Test results will be saved to ../test-results/"
+print_status "Screenshots will be saved to ../screenshots/"
+
+# Start services first
 PLATFORM=$PLATFORM QA_IMAGE="qa-automation:$PLATFORM_TAG" APPIUM_IMAGE="qa-automation:$PLATFORM_TAG" $COMPOSE_CMD -f docker/docker-compose.yml up -d
 
-# Wait for services to be ready
-sleep 10
-
 # Connect to emulator from container (required for host networking)
+sleep 5
 print_status "Connecting to emulator from container..."
 $CONTAINER_ENGINE exec qa-automation adb connect host.docker.internal:5555 || print_warning "Failed to connect to emulator - you may need to accept debug popup manually"
-echo -e "\033[1;41m🚨🚨  ACTION REQUIRED: Please check your emulator screen and ACCEPT any USB debugging popup if prompted! 🚨🚨\033[0m"
+print_status "Please check emulator screen and accept any USB debugging popup if prompted"
 
-print_status "🎉 Services started successfully!"
+# Run tests
+PLATFORM=$PLATFORM QA_IMAGE="qa-automation:$PLATFORM_TAG" APPIUM_IMAGE="qa-automation:$PLATFORM_TAG" $COMPOSE_CMD -f docker/docker-compose.yml exec qa-automation npm test
+
+# Show results
 echo ""
-echo "Services running:"
-echo "- Appium server: http://localhost:4723"
-echo "- QA automation container: qa-automation"
+print_status "🎉 Test execution completed!"
 echo ""
-echo "Next steps:"
-echo "- Run tests: ./docker/run-tests.sh auto"
-echo "- Stop services: ./docker/stop-hybrid.sh"
-echo "- View logs: $COMPOSE_CMD -f docker/docker-compose.yml logs -f"
+echo "Results:"
+echo "- Test reports: ../test-results/"
+echo "- Screenshots: ../screenshots/"
+echo "- Logs: ../logs/"
+
+# Clean up
+print_status "Cleaning up containers..."
+PLATFORM=$PLATFORM QA_IMAGE="qa-automation:$PLATFORM_TAG" APPIUM_IMAGE="qa-automation:$PLATFORM_TAG" $COMPOSE_CMD -f docker/docker-compose.yml down

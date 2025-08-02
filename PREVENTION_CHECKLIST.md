@@ -118,7 +118,6 @@ npm run test:smoke         # Run smoke tests
 
 # Container commands (backup option)
 npm run podman:hybrid      # Use Podman containers
-npm run docker:hybrid      # Use Docker containers
 ```
 
 ---

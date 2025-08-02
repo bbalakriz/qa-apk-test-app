@@ -2,6 +2,47 @@
 
 **Get up and running in 5-6 minutes!** *(Includes Node.js installation & Appium setup)*
 
+## ⚠️ CRITICAL MACHINE-SPECIFIC CONFIGURATION
+
+**🔴 IMPORTANT**: Before running tests, you MUST update the container networking IP for your specific machine:
+
+1. **Find your Podman bridge IP** (the ONLY reliable method):
+   ```bash
+   # Start the container with host networking and check Appium output
+   podman run -it --rm --net=host localhost/qa-automation:linux-amd64 bash
+   
+   # Inside the container, run:
+   export APPIUM_HOME=/tmp/appium
+   export HOME=/tmp
+   npm run appium | grep http
+   
+   # Look for output like:
+   # http://127.0.0.1:4723/ (only accessible from the same host)
+   # http://192.168.127.2:4723/  ← This is your bridge IP!
+   ```
+
+2. **Update the IP in `wdio.conf.js`**:
+   - Open `wdio.conf.js`
+   - Find line ~41: `hostname: process.env.APPIUM_HOST || '192.168.127.2'`
+   - Replace `192.168.127.2` with YOUR machine's bridge IP
+   - Save the file
+
+   **Also update `docker/docker-compose.yml`** line ~37: `APPIUM_HOST=192.168.127.2`
+
+   📖 **Detailed guide**: [IP_CONFIGURATION.md](IP_CONFIGURATION.md)
+
+3. **This IP varies by machine** - what works on one machine won't work on another!
+
+**Common Podman bridge IPs**: 
+- `192.168.127.2` (most common)
+- `10.88.0.1` (some configurations)  
+- `172.17.0.1` (some setups)
+
+**⚠️ Don't guess the IP - use the method above to find YOUR specific IP!**
+
+**❌ Tests will fail with "connect ECONNREFUSED" if this IP is wrong!**  
+**✅ Tests will work perfectly once this IP is correctly configured.**
+
 ## 📋 Prerequisites (2-3 minutes)
 
 ### 🟢 Install Node.js 16+ (1 minute)
@@ -33,7 +74,7 @@ Ensure you also have these **EXACT** versions:
 ✅ **Android Studio** with SDK installed ([Download here](https://developer.android.com/studio))  
 ✅ **Android emulator** running  
 ✅ **ADB 1.0.41** (comes with Android SDK platform-tools)
-✅ **Podman** or **Docker** ([Podman](https://podman.io/getting-started/installation) | [Docker](https://docs.docker.com/get-docker/)) - optional, for containerized runs  
+✅ **Podman** ([Podman Installation Guide](https://podman.io/getting-started/installation)) 
 
 ### ✅ Quick Verification:
 ```bash
@@ -108,6 +149,12 @@ If everything works, you should see:
 
 ## 🆘 Troubleshooting
 
+**Issue**: Tests fail with "connect ECONNREFUSED" or "connection refused"  
+**Most Common Solution**: 
+- **🔴 WRONG BRIDGE IP** - Update the IP in `wdio.conf.js` and `docker/docker-compose.yml` (see section above)
+- Find your IP using the container method: `podman run -it --rm --net=host localhost/qa-automation:linux-amd64 bash` then start Appium and grep for http
+- This is the #1 cause of test failures when switching machines
+
 **Issue**: Tests fail to connect to Appium
 **Solution**: 
 - Check if Appium is running: `curl http://127.0.0.1:4723/status`
@@ -126,7 +173,8 @@ If everything works, you should see:
 **Issue**: ESM/Module loading errors
 **Solution**: 
 - Check version alignment: `npm run verify-versions`
-- If versions differ, use containers for guaranteed consistency: `npm run podman:hybrid` or `npm run docker:hybrid`
+- If versions differ, use Podman containers for guaranteed consistency: `npm run podman:hybrid`
+- For fastest setup, use registry images: `./docker/run-hybrid.sh auto` (auto-pulls from quay.io/balki404/qa-automation)
 - Or install exact local versions: Node 18.20.8, Java 17
 
 ## 📝 Next Steps

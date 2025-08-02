@@ -4,9 +4,9 @@
   "description": "QA Automation tests for Android APK using Appium, WebdriverIO, and Cucumber",
   "main": "index.js",
   "scripts": {
-    "test": "./scripts/run-tests.sh test",
-    "test:smoke": "./scripts/run-tests.sh smoke",
-    "test:regression": "./scripts/run-tests.sh regression",
+    "test": "npx wdio run wdio.conf.js",
+    "test:smoke": "npx wdio run wdio.conf.js --cucumberOpts.tagExpression='@smoke'",
+    "test:regression": "npx wdio run wdio.conf.js",
     "test:setup": "./scripts/run-tests.sh setup",
     "setup": "./scripts/setup-environment.sh",
     "deploy": "./scripts/manage-apk.sh deploy",
@@ -17,11 +17,7 @@
     "appium": "npx appium --port 4723",
     "clean": "rm -rf node_modules screenshots/* test-results/* logs/* && npm install",
     "podman:hybrid": "./docker/start-hybrid.sh",
-    "podman:container-emulator": "cd docker && podman-compose -f docker-compose.container-emulator.yml up",
-    "podman:build": "cd docker && podman build -t qa-automation .",
-    "docker:hybrid": "./docker/start-hybrid.sh",
-    "docker:container-emulator": "cd docker && podman-compose -f docker-compose.container-emulator.yml up",
-    "docker:build": "cd docker && podman build -t qa-automation ."
+    "podman:build": "cd docker && podman build -t qa-automation ."
   },
   "keywords": [
     "appium",

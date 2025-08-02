@@ -3,21 +3,24 @@
 # Works with both Podman and Docker
 # EXACT VERSIONS ALIGNED: Node 18.20.8, OpenJDK 17.0.16, ADB 1.0.41
 
-FROM node:18.20.8-bullseye
+FROM registry.redhat.io/ubi8/nodejs-18:1-140 
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    openjdk-17-jdk \
+# Switch to root user for system installations
+USER root
+
+# Install system dependencies using yum (UBI8 package manager)
+RUN yum update -y && yum install -y \
+    java-17-openjdk-devel \
     wget \
     unzip \
     curl \
     git \
-    python3 \
-    python3-pip \
-    && rm -rf /var/lib/apt/lists/*
+    python39 \
+    python39-pip \
+    && yum clean all
 
-# Set JAVA_HOME
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+# Set JAVA_HOME for UBI8
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 
 # Install Android SDK
 ENV ANDROID_HOME=/opt/android-sdk
@@ -42,8 +45,8 @@ COPY package*.json ./
 # Install npm dependencies
 RUN npm install
 
-# Install Appium and drivers
-RUN npx appium driver install uiautomator2
+# Install Appium uiautomator2 driver to proper location
+RUN APPIUM_HOME=/tmp/appium npx appium driver install uiautomator2
 
 # Copy project files
 COPY . .
@@ -54,8 +57,12 @@ RUN chmod +x scripts/*.sh
 # Expose Appium port
 EXPOSE 4723
 
-# Create necessary directories
-RUN mkdir -p screenshots test-results logs
+# Create necessary directories in /tmp (writable by any user)
+RUN mkdir -p /tmp/appium /tmp/screenshots /tmp/test-results /tmp/logs && \
+    chmod -R 777 /tmp/appium /tmp/screenshots /tmp/test-results /tmp/logs
+
+# Switch back to the default user
+USER 1001
 
 # Default command
 CMD ["npm", "run", "appium"]
