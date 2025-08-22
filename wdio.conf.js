@@ -6,7 +6,7 @@ exports.config = {
     
     // Test Files
     specs: [
-        './features/**/*.feature'
+        './features/**/*launch*.feature'
     ],
     
     // Patterns to exclude
@@ -25,6 +25,7 @@ exports.config = {
         
         // App package and activity - UPDATE THESE BASED ON YOUR APK
         'appium:appPackage': 'com.cucumberappiumdemo', // Replace with your app's package name
+        // 'appium:appPackage': 'com.agenticmobilecheckinapp', // Replace with your app's package name
         'appium:appActivity': '.MainActivity', // Replace with your app's main activity
         
         // Additional capabilities - use fresh session for each scenario
@@ -38,7 +39,7 @@ exports.config = {
     logLevel: 'info',
     bail: 0,
     baseUrl: 'http://host.containers.internal',
-    hostname: process.env.APPIUM_HOST || '192.168.127.2', // CRITICAL: Update this IP for your machine! See QUICK_START.md 
+    hostname: process.env.APPIUM_HOST || '127.0.0.1', //'192.168.127.2', // CRITICAL: Update this IP for your machine! See QUICK_START.md 
     port: 4723,
     path: '/',
     maxInstances: 1, // Run tests sequentially to avoid conflicts
@@ -59,7 +60,7 @@ exports.config = {
     
     // Cucumber options
     cucumberOpts: {
-        require: ['./step-definitions/**/*.ts'],
+        require: ['./step-definitions/**/*launch*.ts'],
         backtrace: false,
         requireModule: [
             'ts-node/register'
