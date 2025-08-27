@@ -17,7 +17,11 @@
     "appium": "npx appium --port 4723",
     "clean": "rm -rf node_modules screenshots/* test-results/* logs/* && npm install",
     "podman:hybrid": "./docker/start-hybrid.sh",
-    "podman:build": "cd docker && podman build -t qa-automation ."
+    "podman:build": "cd docker && podman build -t qa-automation .",
+    "proxy:start": "./scripts/setup-api-proxy.sh start",
+    "proxy:stop": "./scripts/setup-api-proxy.sh stop",
+    "proxy:status": "./scripts/setup-api-proxy.sh status",
+    "proxy:linux": "./scripts/setup-api-proxy-linux.sh start"
   },
   "keywords": [
     "appium",

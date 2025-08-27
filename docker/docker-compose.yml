@@ -12,7 +12,7 @@ version: '3.8'
 
 services:
   qa-automation:
-    image: ${QA_IMAGE:-quay.io/balki404/qa-automation}
+    image: ${QA_IMAGE:-quay.io/balki404/qa-automation:linux-amd64}
     platform: ${PLATFORM:-linux/amd64}
     container_name: qa-automation
     volumes:
@@ -41,7 +41,7 @@ services:
     command: ["sh", "-c", "sleep 5 && tail -f /dev/null"]
 
   appium-server:
-    image: ${APPIUM_IMAGE:-quay.io/balki404/qa-automation}
+    image: ${APPIUM_IMAGE:-quay.io/balki404/qa-automation:linux-amd64}
     platform: ${PLATFORM:-linux/amd64}
     container_name: appium-server
     environment:

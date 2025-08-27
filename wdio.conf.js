@@ -39,7 +39,7 @@ exports.config = {
     logLevel: 'info',
     bail: 0,
     baseUrl: 'http://host.containers.internal',
-    hostname: process.env.APPIUM_HOST || '127.0.0.1', //'192.168.127.2', // CRITICAL: Update this IP for your machine! See QUICK_START.md 
+    hostname: process.env.APPIUM_HOST ||  '192.168.127.2', //'127.0.0.1',// CRITICAL: Update this IP for your machine! See QUICK_START.md 
     port: 4723,
     path: '/',
     maxInstances: 1, // Run tests sequentially to avoid conflicts

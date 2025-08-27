@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# QA APK Test Automation - Hybrid Container Start Script  
-# Framework in container, connects to host emulator
+# QA APK Test Automation - Run Tests Against Running Services
+# Assumes services are already started with start-hybrid.sh
 # Supports Podman
-# Usage: ./start-hybrid.sh [platform]
+# Usage: ./run-tests.sh [platform]
 # Platforms: linux (for WSL), mac-intel, mac-arm, or auto-detect
 
 set -e
@@ -49,8 +49,8 @@ case $PLATFORM_ARG in
         ;;
 esac
 
-echo "🐳 Starting QA Automation (Hybrid Mode - $PLATFORM_TAG)..."
-echo "========================================================="
+echo "🧪 Running QA Tests ($PLATFORM_TAG)..."
+echo "===================================="
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -70,6 +70,30 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# Check for Podman
+if command -v podman &> /dev/null; then
+    CONTAINER_ENGINE="podman"
+    COMPOSE_CMD="podman-compose"
+else
+    print_error "Podman not found!"
+    echo "Please install Podman:"
+    echo "  Podman: https://podman.io/getting-started/installation"
+    exit 1
+fi
+
+# Check if services are running
+print_status "Checking if QA automation services are running..."
+if ! $CONTAINER_ENGINE ps | grep -q "qa-automation\|appium-server"; then
+    print_error "❌ QA automation services are not running!"
+    echo ""
+    echo "Please start the services first:"
+    echo "  ./docker/start-hybrid.sh $PLATFORM_ARG"
+    echo ""
+    exit 1
+fi
+
+print_status "✅ Services are running"
+
 # Check if emulator is running
 print_status "Checking for Android emulator..."
 if adb devices | grep -i "emulator"; then
@@ -84,7 +108,6 @@ else
     echo "3. Start an emulator"
     echo "4. Or use command: emulator -avd <your_avd_name>"
     echo ""
-    echo "Then run this script again."
     exit 1
 fi
 
@@ -92,10 +115,7 @@ fi
 if [ ! -f "./app.apk" ]; then
     print_warning "⚠️  No app.apk found in project root"
     echo "Please copy your APK to the project root:"
-    echo "cp /path/to/your/app.apk ../app.apk"
-    echo ""
-    echo "Or use the deployment script:"
-    echo "npm run deploy /path/to/your/app.apk"
+    echo "cp /path/to/your/app.apk ./app.apk"
     echo ""
     read -p "Continue anyway? (y/N): " continue_anyway
     if [[ ! $continue_anyway =~ ^[Yy]$ ]]; then
@@ -103,45 +123,24 @@ if [ ! -f "./app.apk" ]; then
     fi
 fi
 
-# Build container if needed
-# Check for Podman
-if command -v podman &> /dev/null; then
-    CONTAINER_ENGINE="podman"
-    COMPOSE_CMD="podman-compose"
-else
-    print_error "Podman not found!"
-    echo "Please install Podman:"
-    echo "  Podman: https://podman.io/getting-started/installation"
-    exit 1
-fi
-
-# print_status "Building container using $CONTAINER_ENGINE for platform $PLATFORM..."
-# $CONTAINER_ENGINE build --platform $PLATFORM -t qa-automation:$PLATFORM_TAG -f docker/Dockerfile.ubi8 . || {
-#     print_error "Failed to build container with $CONTAINER_ENGINE"
-#     exit 1
-# }
-
-# Start services
-print_status "Starting QA automation services..."
-print_status "Appium server will be available at http://localhost:4723"
-
-PLATFORM=$PLATFORM QA_IMAGE="qa-automation:$PLATFORM_TAG" APPIUM_IMAGE="qa-automation:$PLATFORM_TAG" $COMPOSE_CMD -f docker/docker-compose.yml up -d
-
-# Wait for services to be ready
-sleep 10
+# Run tests
+print_status "Running tests..."
+print_status "Test results will be saved to ./test-results/"
+print_status "Screenshots will be saved to ./screenshots/"
 
 # Connect to emulator from container (required for host networking)
 print_status "Connecting to emulator from container..."
 $CONTAINER_ENGINE exec qa-automation adb connect host.docker.internal:5555 || print_warning "Failed to connect to emulator - you may need to accept debug popup manually"
 echo -e "\033[1;41m🚨🚨  ACTION REQUIRED: Please check your emulator screen and ACCEPT any USB debugging popup if prompted! 🚨🚨\033[0m"
 
-print_status "🎉 Services started successfully!"
+# Execute tests in the qa-automation container
+PLATFORM=$PLATFORM QA_IMAGE="qa-automation:$PLATFORM_TAG" APPIUM_IMAGE="qa-automation:$PLATFORM_TAG" $COMPOSE_CMD -f docker/docker-compose.yml exec qa-automation npm test
+
+# Show results
 echo ""
-echo "Services running:"
-echo "- Appium server: http://localhost:4723"
-echo "- QA automation container: qa-automation"
+print_status "🎉 Test execution completed!"
 echo ""
-echo "Next steps:"
-echo "- Run tests: ./docker/run-tests.sh auto"
-echo "- Stop services: ./docker/stop-hybrid.sh"
-echo "- View logs: $COMPOSE_CMD -f docker/docker-compose.yml logs -f"
+echo "Results:"
+echo "- Test reports: ./test-results/"
+echo "- Screenshots: ./screenshots/"
+echo "- Logs: ./logs/"
