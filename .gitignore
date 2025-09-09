@@ -9,7 +9,7 @@ screenshots/
 test-results/
 allure-results/
 allure-report/
-reports/
+
 
 # Logs
 logs/
